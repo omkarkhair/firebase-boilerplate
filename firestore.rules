@@ -1,0 +1,18 @@
+service cloud.firestore {
+  
+  match /databases/{database}/documents {
+    match /beats/{userid} {
+      // Only the authenticated user who authored the document can read or write
+      allow read, write: if request.auth.uid != null;
+    }
+  }
+  
+  match /databases/{database}/documents {
+    match /profiles/{userid} {
+      // Only the authenticated user who authored the document can read or write
+      allow read: if request.auth.uid != null;
+      allow write: if request.auth.uid == resource.data.uid;
+      allow create, update: if request.auth.uid != null && request.resource.data.uid == request.auth.uid;
+    }
+  }
+}
